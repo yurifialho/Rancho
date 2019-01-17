@@ -1,0 +1,36 @@
+version: "2"
+services:
+  ranchoapp:
+    build:
+      dockerfile: ./docker/rancho_php_apache.dockerfile
+      context: .
+    image: fialho/ranchoapp
+    container_name: ranchoapp
+    ports:
+      - "80:80"
+    networks:
+      - rancho-netw
+    depends_on:
+      - ranchodb
+    volumes:
+      - ./rancho:/var/www/html
+
+  ranchodb:
+    image: mysql:5.6
+    container_name: ranchodb
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=powertuf
+      - MYSQL_DATABASE=rancho
+      - MYSQL_USER=rancho
+      - MYSQL_PASSWORD=rancho
+    networks:
+      - rancho-netw
+    volumes:
+      - ./mysql:/usr/data
+      - ./docker/configs/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+
+networks:
+  rancho-netw:
+    driver: bridge
